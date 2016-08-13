@@ -140,13 +140,13 @@ public class BleDevice extends RealmObject implements IDisplayable {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
-                Log.d(TAG, "realm count " + bgRealm.where(BleDevice.class).count());
+                Log.d(TAG, "Realm count " + bgRealm.where(BleDevice.class).count());
                 BleDevice realmResult = bgRealm.where(BleDevice.class)
-                        .equalTo("address", address)
+                        .equalTo("Address", address)
                         .findFirst();
 
                 if (realmResult != null) {
-                    Log.d(TAG, "realm entry name " + realmResult.getName() + " / address " + realmResult.getAddress() + " / type " + realmResult.getTypeName() + " / autoConnect " + autoConnectEnabled);
+                    Log.d(TAG, "Realm entry name " + realmResult.getName() + " / address " + realmResult.getAddress() + " / type " + realmResult.getTypeName() + " / autoConnect " + autoConnectEnabled);
 
                     setAutoConnectEnabled(realmResult.isAutoConnectEnabled());
                 }

@@ -47,7 +47,7 @@ public class Mapping implements IDisplayable {
      * @param device device
      */
     public void subscribeTo(BleDevice device) {
-        Log.d(TAG, name + " subscribeTo " + device.getAddress() + " / " + device.getReadingObservable());
+        Log.d(TAG, "Mapping " + name + " subscribes to " + device.getAddress() + " / " + device.getReadingObservable());
 
         sourceSubscribed = true;
         subscription = device.getReadingObservable()
@@ -55,10 +55,8 @@ public class Mapping implements IDisplayable {
                 .subscribe(new Observer<Reading>() {
                     @Override
                     public void onNext(Reading reading) {
-                        Log.v(TAG, "onNext / reading " + reading.meaning + " : " + reading.value);
-
                         if (function.isTriggered(Float.parseFloat(reading.value.toString()))) {
-                            Log.d(TAG, "triggered");
+                            Log.d(TAG, "Mapping triggered");
                             setTriggered(true);
                             action.perform(sink);
                         } else {
@@ -68,7 +66,6 @@ public class Mapping implements IDisplayable {
 
                     @Override
                     public void onCompleted() {
-                        Log.d(TAG, "onCompleted");
                     }
 
                     @Override
@@ -84,7 +81,7 @@ public class Mapping implements IDisplayable {
      * @param device device
      */
     public void unsubscribeFrom(BleDevice device) {
-        Log.d(TAG, name + " unsubscribeFrom " + device.getAddress() + " / " + device.getReadingObservable());
+        Log.d(TAG, "Mapping " + name + " unsubscribes from " + device.getAddress() + " / " + device.getReadingObservable());
 
         sourceSubscribed = false;
         if (subscription != null)
