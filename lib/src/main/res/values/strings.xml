@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">merlot-android</string>
+    <string name="auto_connect_disabled">Auto connect disabled</string>
+    <string name="auto_connect_enabled">Auto connect enabled</string>
 </resources>

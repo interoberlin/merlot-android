@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="merlot_mapping_file_exception">merlot.json</string>
+
+    <string name="pref_golem_temperature_send_period">pref_golem_temperature_send_period</string>
+</resources>
