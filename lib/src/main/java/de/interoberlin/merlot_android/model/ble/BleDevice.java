@@ -130,7 +130,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
             public void execute(Realm bgRealm) {
                 Log.d(TAG, "Realm count " + bgRealm.where(BleDevice.class).count());
                 BleDevice realmResult = bgRealm.where(BleDevice.class)
-                        .equalTo("Address", address)
+                        .equalTo("address", address)
                         .findFirst();
 
                 if (realmResult != null) {
