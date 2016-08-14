@@ -17,4 +17,7 @@
 
     </application>
 
+    <service
+        android:name=".model.ble.BluetoothLeService"
+        android:enabled="true" />
 </manifest>
