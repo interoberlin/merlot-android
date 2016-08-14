@@ -25,7 +25,7 @@ public class DevicesRealm {
                 .modules(new DevicesModule())
                 .build();
 
-        Realm.deleteRealm(realmConfig);
+        // Realm.deleteRealm(realmConfig);
     }
 
     // </editor-fold>
