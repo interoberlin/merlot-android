@@ -22,6 +22,7 @@ repositories {
     }
 }
 
+ext.javadocDir = project.hasProperty('javadoc') ? project.getProperty('javadoc') : 'javadoc'
 ext.versionPatch = project.hasProperty('patch') ? project.getProperty('patch') : versionPatch
 
 android {
