@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.interoberlin.merlot_android.DevicesRealm;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
 import de.interoberlin.merlot_android.model.ble.BleDevicesScanner;
 import de.interoberlin.merlot_android.model.ble.BleScannerFilter;
@@ -264,21 +265,24 @@ public class DevicesController {
     /**
      * Toggles a auto-connect attribute of a given {@code device}
      *
+     * @param context context
      * @param device device
      */
-    public void toggleAutoConnect(BleDevice device) {
+    public void toggleAutoConnect(Context context, BleDevice device) {
         device.setAutoConnectEnabled(!device.isAutoConnectEnabled());
-        device.save();
+        device.save(context);
     }
 
     /**
      * Determines whether a {@code device}'s attribute {@code autoConnectEnabled} is set to true
      *
+     * @param context context
      * @param device device
      * @return true is auto-connect is enabled
      */
-    public boolean isAutoConnectEnabled(BleDevice device) {
-        Realm realm = Realm.getDefaultInstance();
+    public boolean isAutoConnectEnabled(Context context, BleDevice device) {
+        Realm realm = new DevicesRealm(context).getRealm();
+
         boolean autoConnectEnabled = realm.where(BleDevice.class)
                 .equalTo("address", device.getAddress())
                 .equalTo("autoConnectEnabled", true).

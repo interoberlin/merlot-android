@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import de.interoberlin.merlot_android.DevicesRealm;
 import de.interoberlin.merlot_android.R;
 import de.interoberlin.merlot_android.controller.MappingController;
 import de.interoberlin.merlot_android.model.IDisplayable;
@@ -50,44 +51,29 @@ public class BleDevice extends RealmObject implements IDisplayable {
     public static final int READING_HISTORY = 50;
 
     private String name;
-    @PrimaryKey
-    private String address;
-    @Ignore
-    private EDevice type;
+    @PrimaryKey private String address;
+    @Ignore private EDevice type;
     private String typeName;
 
-    @Ignore
-    private BleDeviceManager deviceManager;
-    @Ignore
-    private Observable<? extends BaseService> serviceObservable;
-    @Ignore
-    private BluetoothGatt gatt;
+    @Ignore private BleDeviceManager deviceManager;
+    @Ignore private Observable<? extends BaseService> serviceObservable;
+    @Ignore private BluetoothGatt gatt;
 
-    @Ignore
-    private List<BluetoothGattService> services;
-    @Ignore
-    private List<BluetoothGattCharacteristic> characteristics;
+    @Ignore private List<BluetoothGattService> services;
+    @Ignore private List<BluetoothGattCharacteristic> characteristics;
 
-    @Ignore
-    private Map<String, Queue<Reading>> readings;
-    @Ignore
-    private Map<String, Reading> latestReadings;
-    @Ignore
-    private Map<ECharacteristic, Subscription> subscriptions;
+    @Ignore private Map<String, Queue<Reading>> readings;
+    @Ignore private Map<String, Reading> latestReadings;
+    @Ignore private Map<ECharacteristic, Subscription> subscriptions;
 
-    @Ignore
-    private boolean connected;
-    @Ignore
-    private boolean reading;
-    @Ignore
-    private boolean subscribing;
+    @Ignore private boolean connected;
+    @Ignore private boolean reading;
+    @Ignore private boolean subscribing;
     private boolean autoConnectEnabled;
 
-    @Ignore
-    private ConnectableObservable<Reading> readingObservable;
+    @Ignore private ConnectableObservable<Reading> readingObservable;
 
-    @Ignore
-    private OnChangeListener ocListener;
+    @Ignore private OnChangeListener ocListener;
 
     // </editor-fold>
 
@@ -133,10 +119,12 @@ public class BleDevice extends RealmObject implements IDisplayable {
 
     /**
      * Initializes a ble device object
+     *
+     * @param context context
      */
-    public void init() {
+    public void init(Context context) {
         // Read device from realm
-        final Realm realm = Realm.getDefaultInstance();
+        final Realm realm = new DevicesRealm(context).getRealm();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
@@ -431,8 +419,8 @@ public class BleDevice extends RealmObject implements IDisplayable {
         }
     }
 
-    public void save() {
-        Realm realm = Realm.getDefaultInstance();
+    public void save(Context context) {
+        Realm realm = new DevicesRealm(context).getRealm();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
