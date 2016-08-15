@@ -2,5 +2,6 @@
 -keep @io.realm.annotations.RealmModule class *
 -keep class io.realm.internal.Keep
 -keep @io.realm.internal.Keep class * { *; }
+-keep de.interoberlin.merlot_android.model.ble.BleDevice
 -dontwarn javax.**
 -dontwarn io.realm.**
