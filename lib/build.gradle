@@ -53,6 +53,7 @@ android {
         release {
             minifyEnabled false
             signingConfig signingConfigs.release
+            proguardFile getDefaultProguardFile('proguard-rules.pro')
         }
     }
 
