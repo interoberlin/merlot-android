@@ -1,4 +1,4 @@
-package de.interoberlin.merlot_android.model.mapping;
+package de.interoberlin.merlot_android.model.mapping.exceptions;
 
 public class MappingException extends Throwable {
     // --------------------

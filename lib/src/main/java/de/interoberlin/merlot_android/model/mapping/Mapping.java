@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import de.interoberlin.merlot_android.model.IDisplayable;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
 import de.interoberlin.merlot_android.model.mapping.actions.IAction;
+import de.interoberlin.merlot_android.model.mapping.exceptions.MappingException;
 import de.interoberlin.merlot_android.model.mapping.functions.IFunction;
 import de.interoberlin.merlot_android.model.service.Reading;
 import rx.Observer;
