@@ -5,6 +5,7 @@ public class Source {
 
     private String address;
     private String characteristic;
+    private String node;
 
     // </editor-fold>
 
@@ -46,6 +47,14 @@ public class Source {
 
     public void setCharacteristic(String characteristic) {
         this.characteristic = characteristic;
+    }
+
+    public String getNode() {
+        return node;
+    }
+
+    public void setNode(String node) {
+        this.node = node;
     }
 
     // </editor-fold>

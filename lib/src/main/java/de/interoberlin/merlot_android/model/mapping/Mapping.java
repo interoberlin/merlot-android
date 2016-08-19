@@ -2,6 +2,11 @@ package de.interoberlin.merlot_android.model.mapping;
 
 import android.util.Log;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.internal.LinkedTreeMap;
+
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.interoberlin.merlot_android.model.IDisplayable;
@@ -55,7 +60,18 @@ public class Mapping implements IDisplayable {
                 .subscribe(new Observer<Reading>() {
                     @Override
                     public void onNext(Reading reading) {
-                        if (function.isTriggered(Float.parseFloat(reading.value.toString()))) {
+                        float value = 0;
+                        if (getSource().getNode() == null) {
+                            value = Float.parseFloat(reading.value.toString());
+                        } else {
+                            try {
+                                value = Float.parseFloat(getNodeValue(reading.value.toString(), source.getNode()));
+                            } catch (MappingException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (function.isTriggered(value)) {
                             Log.d(TAG, "Mapping triggered");
                             setTriggered(true);
                             action.perform(sink);
@@ -73,6 +89,39 @@ public class Mapping implements IDisplayable {
                         Log.d(TAG, e.getMessage());
                     }
                 });
+    }
+
+    /**
+     * Retrieves a node value from an unknown json
+     * <p/>
+     * E.g.
+     * json  = { "coordinate" : { "x" : 1.0, "y" : 2.0 }}
+     * nodes = "coordinate.x"
+     * will return 1.0
+     *
+     * @param json  json file
+     * @param nodes period-concatenated nodes
+     * @return node value
+     */
+    private String getNodeValue(String json, String nodes) throws MappingException {
+        LinkedTreeMap ltm = (LinkedTreeMap) new GsonBuilder().create().fromJson(json, Object.class);
+        List<String> nodeArray = Arrays.asList(nodes.split("\\."));
+
+        for (int i=0; i<nodeArray.size(); i++) {
+            String node = nodeArray.get(i);
+
+            if (i == nodeArray.size()-1) {
+                // Leaf reached
+                return ltm.get(node).toString();
+            } else if (ltm.containsKey(node)) {
+                // Dig deeper
+                ltm = (LinkedTreeMap) new GsonBuilder().create().fromJson(ltm.get(node).toString(), Object.class);
+            } else {
+                throw new MappingException("Unable to get node " + nodes + " from json " + json);
+            }
+        }
+
+        return ltm.toString();
     }
 
     /**
