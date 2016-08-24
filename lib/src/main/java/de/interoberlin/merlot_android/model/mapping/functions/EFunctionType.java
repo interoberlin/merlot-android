@@ -3,6 +3,8 @@ package de.interoberlin.merlot_android.model.mapping.functions;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.interoberlin.merlot_android.model.mapping.actions.EActionType;
+
 public enum EFunctionType {
     // <editor-fold defaultstate="collapsed" desc="Entries">
 
@@ -35,6 +37,15 @@ public enum EFunctionType {
     // --------------------
 
     // <editor-fold defaultstate="collapsed" desc="Methods">
+
+    public static EFunctionType fromString(String name) {
+        for (EFunctionType e : EFunctionType.values()) {
+            if (e.getName().equals(name))
+                return e;
+        }
+
+        return null;
+    }
 
     public static List<String> getNamesList() {
         List names = new ArrayList<>();

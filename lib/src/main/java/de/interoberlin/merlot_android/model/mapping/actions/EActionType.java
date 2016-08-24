@@ -36,6 +36,15 @@ public enum EActionType {
 
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
+    public static EActionType fromString(String name) {
+        for (EActionType e : EActionType.values()) {
+            if (e.getName().equals(name))
+                return e;
+        }
+
+        return null;
+    }
+
     public static List<String> getNamesList() {
         List names = new ArrayList<>();
 
