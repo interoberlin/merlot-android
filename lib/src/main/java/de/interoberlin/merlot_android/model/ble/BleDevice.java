@@ -211,6 +211,16 @@ public class BleDevice extends RealmObject implements IDisplayable {
      * @param characteristic characteristic
      */
     public void read(final ECharacteristic characteristic) {
+        read(characteristic, false);
+    }
+
+    /**
+     * Reads a single value from a characteristic
+     *
+     * @param characteristic characteristic
+     * @param debug          debug
+     */
+    public void read(final ECharacteristic characteristic, final boolean debug) {
         Log.d(TAG, "Read " + characteristic.getId());
 
         connect()
@@ -236,7 +246,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
 
                 String value = BleDataParser.getFormattedValue(null, characteristic, bluetoothGattCharacteristic.getValue());
                 Log.d(TAG, "Read " + characteristic.getId() + " : " + value);
-                setCharacteristicValue(characteristic.getId(), value);
+                setCharacteristicValue(characteristic.getId(), value, debug);
             }
         });
     }
@@ -292,7 +302,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
                     @Override
                     public void onNext(Reading reading) {
                         if (debug) {
-                            setCharacteristicValue(characteristic.getId(), reading.toString());
+                            setCharacteristicValue(characteristic.getId(), reading.toString(), debug);
                         } else {
                             Queue<Reading> queue;
                             if (readings.containsKey(reading.meaning)) {
@@ -309,7 +319,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
                             readings.put(reading.meaning, queue);
                             latestReadings.put(reading.meaning, reading);
 
-                            setCharacteristicValue(characteristic.getId(), reading.toString());
+                            setCharacteristicValue(characteristic.getId(), reading.toString(), debug);
                         }
                     }
                 });
@@ -442,11 +452,15 @@ public class BleDevice extends RealmObject implements IDisplayable {
         return null;
     }
 
-    public void setCharacteristicValue(String id, String value) {
-        for (BluetoothGattCharacteristic c : getCharacteristics()) {
-            if (c.getUuid().toString().contains(id)) {
-                c.setValue(value);
-                if (ocListener != null) ocListener.onChange(BleDevice.this);
+    public void setCharacteristicValue(String id, String value, boolean debug) {
+        if (debug) {
+            if (ocListener != null) ocListener.onChange(BleDevice.this, id, value);
+        } else {
+            for (BluetoothGattCharacteristic c : getCharacteristics()) {
+                if (c.getUuid().toString().contains(id)) {
+                    c.setValue(value);
+                    if (ocListener != null) ocListener.onChange(BleDevice.this);
+                }
             }
         }
     }
@@ -658,6 +672,8 @@ public class BleDevice extends RealmObject implements IDisplayable {
         void onChange(BleDevice device);
 
         void onChange(BleDevice device, int text);
+
+        void onChange(BleDevice device, String characteristic, String value);
 
         void onCacheCleared(boolean success);
     }
