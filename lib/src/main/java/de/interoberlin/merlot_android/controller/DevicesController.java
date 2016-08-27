@@ -169,6 +169,10 @@ public class DevicesController {
         });
     }
 
+    public void addDiscoveredDevice(BleDevice device) {
+        bluetoothDeviceManager.addDiscoveredDevice(device);
+    }
+
     /**
      * Attaches a device
      *

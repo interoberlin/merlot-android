@@ -49,7 +49,7 @@ public class BleDeviceManager {
     }
 
     // TODO EXTREMELY IMPORTANT METHOD
-    void addDiscoveredDevice(BleDevice device) {
+    public void addDiscoveredDevice(BleDevice device) {
         discoveredDevices.remove(device.getAddress());
         discoveredDevices.put(device.getAddress(), device);
 
