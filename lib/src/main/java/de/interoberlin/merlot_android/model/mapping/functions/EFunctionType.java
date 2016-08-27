@@ -3,8 +3,6 @@ package de.interoberlin.merlot_android.model.mapping.functions;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.interoberlin.merlot_android.model.mapping.actions.EActionType;
-
 public enum EFunctionType {
     // <editor-fold defaultstate="collapsed" desc="Entries">
 
