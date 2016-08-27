@@ -326,7 +326,8 @@ public class BleDevice extends RealmObject implements IDisplayable {
 
         subscriptions.put(characteristic, subscription);
         setSubscribing(true);
-        getReadingObservable().connect();
+        if (getReadingObservable() != null)
+            getReadingObservable().connect();
         return subscription;
     }
 
