@@ -26,7 +26,6 @@ import de.interoberlin.merlot_android.model.config.EService;
 import de.interoberlin.merlot_android.model.parser.BleDataParser;
 import de.interoberlin.merlot_android.model.service.BaseService;
 import de.interoberlin.merlot_android.model.service.BleDeviceManager;
-import de.interoberlin.merlot_android.model.service.DirectConnectionService;
 import de.interoberlin.merlot_android.model.service.Reading;
 import io.realm.Realm;
 import io.realm.RealmObject;
@@ -111,7 +110,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
         this.typeName = (type != null) ? type.getName() : EDevice.UNKNOWN.toString();
 
         this.deviceManager = manager;
-        this.serviceObservable = DirectConnectionService.connect(context, this, device).cache();
+        this.serviceObservable = BaseService.connect(context, this, device).cache();
 
         this.services = new ArrayList<>();
         this.characteristics = new ArrayList<>();
@@ -277,7 +276,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
                 .flatMap(new Func1<BaseService, ConnectableObservable<Reading>>() {
                     @Override
                     public ConnectableObservable<Reading> call(BaseService baseService) {
-                        ConnectableObservable<Reading> readingObservable = ((DirectConnectionService) baseService).subscribe(characteristic).publish();
+                        ConnectableObservable<Reading> readingObservable = baseService.subscribe(characteristic.getService(), characteristic).publish();
                         setReadingObservable(readingObservable);
                         MappingController.getInstance(context).flangeAll();
 
