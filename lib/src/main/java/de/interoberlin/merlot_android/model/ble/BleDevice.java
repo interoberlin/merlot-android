@@ -51,29 +51,44 @@ public class BleDevice extends RealmObject implements IDisplayable {
     public static final int READING_HISTORY = 50;
 
     private String name;
-    @PrimaryKey private String address;
-    @Ignore private EDevice type;
+    @PrimaryKey
+    private String address;
+    @Ignore
+    private EDevice type;
     private String typeName;
 
-    @Ignore private BleDeviceManager deviceManager;
-    @Ignore private Observable<? extends BaseService> serviceObservable;
-    @Ignore private BluetoothGatt gatt;
+    @Ignore
+    private BleDeviceManager deviceManager;
+    @Ignore
+    private Observable<? extends BaseService> serviceObservable;
+    @Ignore
+    private BluetoothGatt gatt;
 
-    @Ignore private List<BluetoothGattService> services;
-    @Ignore private List<BluetoothGattCharacteristic> characteristics;
+    @Ignore
+    private List<BluetoothGattService> services;
+    @Ignore
+    private List<BluetoothGattCharacteristic> characteristics;
 
-    @Ignore private Map<String, Queue<Reading>> readings;
-    @Ignore private Map<String, Reading> latestReadings;
-    @Ignore private Map<ECharacteristic, Subscription> subscriptions;
+    @Ignore
+    private Map<String, Queue<Reading>> readings;
+    @Ignore
+    private Map<String, Reading> latestReadings;
+    @Ignore
+    private Map<ECharacteristic, Subscription> subscriptions;
 
-    @Ignore private boolean connected;
-    @Ignore private boolean reading;
-    @Ignore private boolean subscribing;
+    @Ignore
+    private boolean connected;
+    @Ignore
+    private boolean reading;
+    @Ignore
+    private boolean subscribing;
     private boolean autoConnectEnabled;
 
-    @Ignore private ConnectableObservable<Reading> readingObservable;
+    @Ignore
+    private ConnectableObservable<Reading> readingObservable;
 
-    @Ignore private OnChangeListener ocListener;
+    @Ignore
+    private OnChangeListener ocListener;
 
     // </editor-fold>
 
@@ -229,10 +244,23 @@ public class BleDevice extends RealmObject implements IDisplayable {
     /**
      * Subscribes to a characteristic with a given {@code id}
      *
+     * @param context        context
      * @param characteristic characteristic
      * @return subscription
      */
     public Subscription subscribe(final Context context, final ECharacteristic characteristic) {
+        return subscribe(context, characteristic, false);
+    }
+
+    /**
+     * Subscribes to a characteristic with a given {@code id}
+     *
+     * @param context        context
+     * @param characteristic characteristic
+     * @param debug          debug version
+     * @return subscription
+     */
+    public Subscription subscribe(final Context context, final ECharacteristic characteristic, final boolean debug) {
         Log.d(TAG, "Subscribe " + characteristic.getId());
 
         Subscription subscription = connect()
@@ -263,22 +291,26 @@ public class BleDevice extends RealmObject implements IDisplayable {
 
                     @Override
                     public void onNext(Reading reading) {
-                        Queue<Reading> queue;
-                        if (readings.containsKey(reading.meaning)) {
-                            queue = readings.get(reading.meaning);
+                        if (debug) {
+                            setCharacteristicValue(characteristic.getId(), reading.toString());
                         } else {
-                            // Init queue and add dummy values
-                            queue = EvictingQueue.create(READING_HISTORY);
-                            for (int i = 0; i < READING_HISTORY; i++) {
-                                queue.add(new Reading(0, 0, reading.meaning, reading.path, ""));
+                            Queue<Reading> queue;
+                            if (readings.containsKey(reading.meaning)) {
+                                queue = readings.get(reading.meaning);
+                            } else {
+                                // Init queue and add dummy values
+                                queue = EvictingQueue.create(READING_HISTORY);
+                                for (int i = 0; i < READING_HISTORY; i++) {
+                                    queue.add(new Reading(0, 0, reading.meaning, reading.path, ""));
+                                }
                             }
+
+                            queue.add(reading);
+                            readings.put(reading.meaning, queue);
+                            latestReadings.put(reading.meaning, reading);
+
+                            setCharacteristicValue(characteristic.getId(), reading.toString());
                         }
-
-                        queue.add(reading);
-                        readings.put(reading.meaning, queue);
-                        latestReadings.put(reading.meaning, reading);
-
-                        setCharacteristicValue(characteristic.getId(), reading.toString());
                     }
                 });
 
