@@ -50,44 +50,29 @@ public class BleDevice extends RealmObject implements IDisplayable {
     public static final int READING_HISTORY = 50;
 
     private String name;
-    @PrimaryKey
-    private String address;
-    @Ignore
-    private EDevice type;
+    @PrimaryKey private String address;
+    @Ignore  private EDevice type;
     private String typeName;
+    @Ignore int rssi;
+    @Ignore private BleDeviceManager deviceManager;
+    @Ignore private Observable<? extends BaseService> serviceObservable;
+    @Ignore private BluetoothGatt gatt;
 
-    @Ignore
-    private BleDeviceManager deviceManager;
-    @Ignore
-    private Observable<? extends BaseService> serviceObservable;
-    @Ignore
-    private BluetoothGatt gatt;
+    @Ignore private List<BluetoothGattService> services;
+    @Ignore private List<BluetoothGattCharacteristic> characteristics;
 
-    @Ignore
-    private List<BluetoothGattService> services;
-    @Ignore
-    private List<BluetoothGattCharacteristic> characteristics;
+    @Ignore private Map<String, Queue<Reading>> readings;
+    @Ignore private Map<String, Reading> latestReadings;
+    @Ignore private Map<ECharacteristic, Subscription> subscriptions;
 
-    @Ignore
-    private Map<String, Queue<Reading>> readings;
-    @Ignore
-    private Map<String, Reading> latestReadings;
-    @Ignore
-    private Map<ECharacteristic, Subscription> subscriptions;
-
-    @Ignore
-    private boolean connected;
-    @Ignore
-    private boolean reading;
-    @Ignore
-    private boolean subscribing;
+    @Ignore private boolean connected;
+    @Ignore private boolean reading;
+    @Ignore private boolean subscribing;
     private boolean autoConnectEnabled;
 
-    @Ignore
-    private ConnectableObservable<Reading> readingObservable;
+    @Ignore private ConnectableObservable<Reading> readingObservable;
 
-    @Ignore
-    private OnChangeListener ocListener;
+    @Ignore private OnChangeListener ocListener;
 
     // </editor-fold>
 
@@ -101,14 +86,14 @@ public class BleDevice extends RealmObject implements IDisplayable {
         super();
     }
 
-    public BleDevice(Context context, BluetoothDevice device, BleDeviceManager manager) {
+    public BleDevice(Context context, BluetoothDevice device, int rssi, BleDeviceManager manager) {
         super();
 
         this.name = device.getName();
         this.address = device.getAddress();
         this.type = EDevice.fromString(device.getName());
         this.typeName = (type != null) ? type.getName() : EDevice.UNKNOWN.toString();
-
+        this.rssi = rssi;
         this.deviceManager = manager;
         this.serviceObservable = BaseService.connect(context, this, device).cache();
 
@@ -548,6 +533,8 @@ public class BleDevice extends RealmObject implements IDisplayable {
     public String getTypeName() {
         return typeName;
     }
+
+    public int getRssi() { return rssi; }
 
     /*
     public BluetoothGatt getGatt() {
