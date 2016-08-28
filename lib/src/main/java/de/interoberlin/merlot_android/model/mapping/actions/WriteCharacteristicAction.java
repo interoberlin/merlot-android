@@ -2,7 +2,7 @@ package de.interoberlin.merlot_android.model.mapping.actions;
 
 import de.interoberlin.merlot_android.controller.DevicesController;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
-import de.interoberlin.merlot_android.model.config.ECharacteristic;
+import de.interoberlin.merlot_android.model.repository.ECharacteristic;
 import de.interoberlin.merlot_android.model.mapping.Sink;
 
 public class WriteCharacteristicAction implements IAction {

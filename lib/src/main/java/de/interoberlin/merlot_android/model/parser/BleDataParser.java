@@ -4,8 +4,8 @@ import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.google.gson.Gson;
 
-import de.interoberlin.merlot_android.model.config.ECharacteristic;
-import de.interoberlin.merlot_android.model.config.EDevice;
+import de.interoberlin.merlot_android.model.repository.ECharacteristic;
+import de.interoberlin.merlot_android.model.repository.EDevice;
 
 public abstract class BleDataParser {
     // <editor-fold defaultstate="collapsed" desc="Members">

@@ -1,21 +1,9 @@
-package de.interoberlin.merlot_android.model.config;
+package de.interoberlin.merlot_android.model.repository;
 
-public enum EService {
+public enum EDescriptor {
     // <editor-fold defaultstate="collapsed" desc="Entries">
 
-    GENERIC_ACCESS("00001800-0000-1000-8000-00805f9b34fb"),
-    GENERIC_ATTRIBUTE("00001801-0000-1000-8000-00805f9b34fb"),
-    DEVICE_INFORMATION("0000180a-0000-1000-8000-00805f9b34fb"),
-    BATTERY_LEVEL("0000180f-0000-1000-8000-00805f9b34fb"),
-
-    CONNECTED_TO_MASTER_MODULE("00002000-0000-1000-8000-00805f9b34fb"),
-    DIRECT_CONNECTION("00002002-0000-1000-8000-00805f9b34fb"),
-
-    HEART_RATE("0000180d-0000-1000-8000-00805f9b34fb"),
-
-    INTEROBERLIN_UART("00002001-0000-1000-8000-00805f9b34fb"),
-    SENTIENT_LIGHT_FLOOR_SENSOR("00003001-0000-1000-8000-00805f9b34fb"),
-    SENTIENT_LIGHT_LED("00004001-0000-1000-8000-00805f9b34fb");
+    DATA_NOTIFICATIONS("00002902-0000-1000-8000-00805f9b34fb");
 
     // </editor-fold>
 
@@ -31,20 +19,20 @@ public enum EService {
 
     // <editor-fold defaultstate="collapsed" desc="Constructors">
 
-    EService(String id) {
+    EDescriptor(String id) {
         this.id = id;
     }
 
     // </editor-fold>
 
     // --------------------
-    // Methods
+    // Getters / Setters
     // --------------------
 
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
-    public static EService fromId(String id) {
-        for (EService s : EService.values()) {
+    public static EDescriptor fromId(String id) {
+        for (EDescriptor s : EDescriptor.values()) {
             if (s.getId().equals(id))
                 return s;
         }

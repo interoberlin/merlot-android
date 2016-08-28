@@ -9,9 +9,9 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 import de.interoberlin.merlot_android.model.ble.BleDevice;
-import de.interoberlin.merlot_android.model.config.ECharacteristic;
-import de.interoberlin.merlot_android.model.config.EDescriptor;
-import de.interoberlin.merlot_android.model.config.EService;
+import de.interoberlin.merlot_android.model.repository.ECharacteristic;
+import de.interoberlin.merlot_android.model.repository.EDescriptor;
+import de.interoberlin.merlot_android.model.repository.EService;
 import de.interoberlin.merlot_android.model.parser.BleDataParser;
 import de.interoberlin.merlot_android.model.parser.DataPackage;
 import de.interoberlin.merlot_android.model.service.error.CharacteristicNotFoundException;

@@ -1,4 +1,4 @@
-package de.interoberlin.merlot_android.model.config;
+package de.interoberlin.merlot_android.model.repository;
 
 public enum EDevice {
     // <editor-fold defaultstate="collapsed" desc="Entries">
