@@ -1,5 +1,8 @@
 package de.interoberlin.merlot_android.model.repository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum EService {
     // <editor-fold defaultstate="collapsed" desc="Entries">
 
@@ -52,6 +55,18 @@ public enum EService {
         }
 
         return null;
+    }
+
+    public List<ECharacteristic> getCharacteristics() {
+        List<ECharacteristic> characteristics = new ArrayList<>();
+
+        for (ECharacteristic e : ECharacteristic.values()) {
+            if (e.getService() == this) {
+                characteristics.add(e);
+            }
+        }
+
+        return characteristics;
     }
 
     // </editor-fold>
