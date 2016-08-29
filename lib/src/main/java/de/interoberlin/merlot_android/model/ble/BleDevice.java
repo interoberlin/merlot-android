@@ -285,6 +285,8 @@ public class BleDevice extends RealmObject implements IDisplayable {
 
                     @Override
                     public void onNext(Reading reading) {
+                        Log.d(TAG, "Next value " + reading.meaning);
+
                         if (debug) {
                             setCharacteristicValue(characteristic.getId(), reading.toString(), debug);
                         } else {
