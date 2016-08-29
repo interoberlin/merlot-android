@@ -8,12 +8,13 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
+import de.interoberlin.mate.lib.model.Log;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
+import de.interoberlin.merlot_android.model.parser.BleDataParser;
+import de.interoberlin.merlot_android.model.parser.DataPackage;
 import de.interoberlin.merlot_android.model.repository.ECharacteristic;
 import de.interoberlin.merlot_android.model.repository.EDescriptor;
 import de.interoberlin.merlot_android.model.repository.EService;
-import de.interoberlin.merlot_android.model.parser.BleDataParser;
-import de.interoberlin.merlot_android.model.parser.DataPackage;
 import de.interoberlin.merlot_android.model.service.error.CharacteristicNotFoundException;
 import de.interoberlin.merlot_android.model.util.BleUtils;
 import rx.Observable;
@@ -142,6 +143,8 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
+                        Log.d(TAG, "Received " + s);
+
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
