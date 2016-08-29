@@ -103,12 +103,15 @@ public class BaseService extends Service {
                 .map(new Func1<BluetoothGattCharacteristic, String>() {
                     @Override
                     public String call(BluetoothGattCharacteristic c) {
+                        Log.d(TAG, "Received " + new String(c.getValue()));
+
                         return BleDataParser.getFormattedValue(device.getType(), characteristic, c.getValue());
                     }
                 })
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
+                        Log.d(TAG, "Processed " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
@@ -137,13 +140,15 @@ public class BaseService extends Service {
                 .map(new Func1<BluetoothGattCharacteristic, String>() {
                     @Override
                     public String call(BluetoothGattCharacteristic c) {
+                        Log.d(TAG, "Received " + new String(c.getValue()));
+
                         return BleDataParser.getFormattedValue(device.getType(), characteristic, c.getValue());
                     }
                 })
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.d(TAG, "Received " + s);
+                        Log.d(TAG, "Processed " + s);
 
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
