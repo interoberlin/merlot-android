@@ -89,7 +89,7 @@ public abstract class BleDataParser {
                 return String.valueOf(getIntValue(value, BluetoothGattCharacteristic.FORMAT_UINT8, 0));
             }
             default: {
-                return "";
+                return new String(value);
             }
         }
     }

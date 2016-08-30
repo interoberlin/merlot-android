@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Context;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import de.interoberlin.mate.lib.model.Log;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
@@ -55,7 +56,7 @@ public class BaseService extends Service {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     public static Observable<BaseService> connect(final Context context, final BleDevice bleDevice,
-                                                              final BluetoothDevice device) {
+                                                  final BluetoothDevice device) {
         final BluetoothGattReceiver receiver = new BluetoothGattReceiver();
         return doConnect(context, device, receiver, false)
                 .flatMap(new BondingReceiver.BondingFunc1(context))
@@ -103,22 +104,24 @@ public class BaseService extends Service {
                 .map(new Func1<BluetoothGattCharacteristic, String>() {
                     @Override
                     public String call(BluetoothGattCharacteristic c) {
-                        Log.d(TAG, "Received " + new String(c.getValue()));
-
                         return BleDataParser.getFormattedValue(device.getType(), characteristic, c.getValue());
                     }
                 })
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.d(TAG, "Processed " + s);
+                        Log.v(TAG, "Processed " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
-                                DataPackage data = new Gson().fromJson(s, DataPackage.class);
-                                for (DataPackage.Data dataPoint : data.readings) {
-                                    subscriber.onNext(new Reading(data.received, dataPoint.recorded,
-                                            dataPoint.meaning, dataPoint.path, dataPoint.value));
+                                try {
+                                    DataPackage data = new Gson().fromJson(s, DataPackage.class);
+                                    for (DataPackage.Data dataPoint : data.readings) {
+                                        subscriber.onNext(new Reading(data.received, dataPoint.recorded,
+                                                dataPoint.meaning, dataPoint.path, dataPoint.value));
+                                    }
+                                } catch (JsonSyntaxException e) {
+                                    subscriber.onNext(new Reading(System.currentTimeMillis(), System.currentTimeMillis(), "", "", s));
                                 }
                             }
                         });
@@ -130,7 +133,7 @@ public class BaseService extends Service {
         BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(mBluetoothGatt.getServices(), service.getId(), characteristic.getId());
 
         if (characteristic == null) {
-            return error(new CharacteristicNotFoundException(characteristic.getId()));
+            return error(new CharacteristicNotFoundException("Service " + service.getId() + " / characteristic " + characteristic.getId()));
         }
 
         BluetoothGattDescriptor descriptor = BleUtils.getDescriptorInCharacteristic(
@@ -140,23 +143,24 @@ public class BaseService extends Service {
                 .map(new Func1<BluetoothGattCharacteristic, String>() {
                     @Override
                     public String call(BluetoothGattCharacteristic c) {
-                        Log.d(TAG, "Received " + new String(c.getValue()));
-
                         return BleDataParser.getFormattedValue(device.getType(), characteristic, c.getValue());
                     }
                 })
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.d(TAG, "Processed " + s);
-
+                        Log.v(TAG, "Processed " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
-                                DataPackage data = new Gson().fromJson(s, DataPackage.class);
-                                for (DataPackage.Data dataPoint : data.readings) {
-                                    subscriber.onNext(new Reading(data.received, dataPoint.recorded,
-                                            dataPoint.meaning, dataPoint.path, dataPoint.value));
+                                try {
+                                    DataPackage data = new Gson().fromJson(s, DataPackage.class);
+                                    for (DataPackage.Data dataPoint : data.readings) {
+                                        subscriber.onNext(new Reading(data.received, dataPoint.recorded,
+                                                dataPoint.meaning, dataPoint.path, dataPoint.value));
+                                    }
+                                } catch (JsonSyntaxException e) {
+                                    subscriber.onNext(new Reading(System.currentTimeMillis(), System.currentTimeMillis(), "", "", s));
                                 }
                             }
                         });
@@ -165,7 +169,6 @@ public class BaseService extends Service {
     }
 
     public Observable<BluetoothGattCharacteristic> stopSubscribing(final EService service, final ECharacteristic characteristic) {
-
         BluetoothGattCharacteristic gattCharacteristic = BleUtils.getCharacteristicInServices(
                 mBluetoothGatt.getServices(), service.getId(), characteristic.getId());
         if (characteristic == null) {
