@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 
 import de.interoberlin.merlot_android.model.util.DeviceCompatibilityUtils;
 import rx.Observable;
@@ -20,6 +21,8 @@ import static rx.Observable.just;
 
 class BondingReceiver {
     // <editor-fold defaultstate="collapsed" desc="Members">
+
+    public static final String TAG = BondingReceiver.class.getSimpleName();
 
     private Context context;
 
@@ -56,6 +59,7 @@ class BondingReceiver {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     static Observable<BluetoothGatt> subscribeForBondStateChanges(final Context context, final BluetoothGatt gatt) {
+        Log.d(TAG, "Subscribe for bond state changes");
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(final Subscriber<? super BluetoothGatt> subscriber) {

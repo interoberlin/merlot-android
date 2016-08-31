@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Context;
+import android.util.Log;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -26,8 +27,10 @@ import static rx.Observable.just;
 public class Service {
     // <editor-fold defaultstate="collapsed" desc="Members">
 
-    protected BluetoothGatt mBluetoothGatt;
-    protected final BluetoothGattReceiver mBluetoothGattReceiver;
+    public static final String TAG = Service.class.getName();
+
+    protected BluetoothGatt gatt;
+    protected final BluetoothGattReceiver bluetoothGattReceiver;
 
     // </editor-fold>
 
@@ -38,8 +41,8 @@ public class Service {
     // <editor-fold defaultstate="collapsed" desc="Constructors">
 
     protected Service(BluetoothGatt gatt, BluetoothGattReceiver receiver) {
-        mBluetoothGatt = gatt;
-        mBluetoothGattReceiver = receiver;
+        this.gatt = gatt;
+        bluetoothGattReceiver = receiver;
     }
 
     // </editor-fold>
@@ -51,12 +54,13 @@ public class Service {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     public BluetoothGatt getGatt() {
-        return mBluetoothGatt;
+        return gatt;
     }
 
     protected static Observable<? extends BluetoothGatt> doConnect(final Context context,
             final BluetoothDevice bluetoothDevice, final BluetoothGattReceiver receiver,
             final boolean unBond) {
+        Log.d(TAG, "Do connect");
         return receiver
                 .connect(context, bluetoothDevice)
                 .flatMap(new Func1<BluetoothGatt, Observable<? extends BluetoothGatt>>() {
@@ -87,20 +91,21 @@ public class Service {
     public Observable<BluetoothGattCharacteristic> write(byte[] bytes,
                                                          String serviceUuid,
                                                          String characteristicUuid) {
+        Log.d(TAG, "Service " + serviceUuid + " / " + characteristicUuid + " : " + bytes);
         BluetoothGattCharacteristic characteristic = BleUtils.getCharacteristicInServices(
-                mBluetoothGatt.getServices(), serviceUuid, characteristicUuid);
+                gatt.getServices(), serviceUuid, characteristicUuid);
         if (characteristic == null) {
             return error(new CharacteristicNotFoundException(characteristicUuid));
         }
         characteristic.setValue(bytes);
-        return mBluetoothGattReceiver.writeCharacteristic(mBluetoothGatt, characteristic);
+        return bluetoothGattReceiver.writeCharacteristic(gatt, characteristic);
     }
 
     protected Observable<BluetoothGatt> longWrite(final byte[] data, String serviceUuid,
                                                   final String characteristicUuid) {
 
         final BluetoothGattCharacteristic characteristic = BleUtils.getCharacteristicInServices(
-                mBluetoothGatt.getServices(), serviceUuid, characteristicUuid);
+                gatt.getServices(), serviceUuid, characteristicUuid);
 
         if (characteristic == null)
             return error(new CharacteristicNotFoundException(characteristicUuid));
@@ -110,7 +115,7 @@ public class Service {
                 .create(new Observable.OnSubscribe<BluetoothGatt>() {
                     @Override
                     public void call(Subscriber<? super BluetoothGatt> subscriber) {
-                        mBluetoothGatt.beginReliableWrite();
+                        gatt.beginReliableWrite();
                         sendPayload(dataParser, characteristic, subscriber);
                     }
                 })
@@ -120,7 +125,7 @@ public class Service {
                 .doOnError(new Action1<Throwable>() {
                     @Override
                     public void call(Throwable t) {
-                        DeviceCompatibilityUtils.refresh(mBluetoothGatt);
+                        DeviceCompatibilityUtils.refresh(gatt);
                     }
                 });
     }
@@ -131,12 +136,12 @@ public class Service {
         final byte[] data = parser.getData();
 
         if (data.length == 0) {
-            mBluetoothGatt.executeReliableWrite();
+            gatt.executeReliableWrite();
             return;
         }
 
         characteristic.setValue(data);
-        mBluetoothGattReceiver.reliableWriteCharacteristic(mBluetoothGatt, characteristic, subscriber);
+        bluetoothGattReceiver.reliableWriteCharacteristic(gatt, characteristic, subscriber);
 
         Observable.create(
                 new Observable.OnSubscribe<Object>() {
@@ -155,11 +160,11 @@ public class Service {
                                                                       String characteristicUuid,
                                                                       final String what) {
         BluetoothGattCharacteristic characteristic = BleUtils.getCharacteristicInServices(
-                mBluetoothGatt.getServices(), serviceUuid, characteristicUuid);
+                gatt.getServices(), serviceUuid, characteristicUuid);
         if (characteristic == null) {
             return error(new CharacteristicNotFoundException(what));
         }
-        return mBluetoothGattReceiver.readCharacteristic(mBluetoothGatt, characteristic);
+        return bluetoothGattReceiver.readCharacteristic(gatt, characteristic);
     }
 
     protected Observable<Float> readFloatCharacteristic(String serviceUuid,

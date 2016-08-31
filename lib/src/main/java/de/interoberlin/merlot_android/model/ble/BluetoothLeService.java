@@ -68,7 +68,7 @@ public class BluetoothLeService extends Service {
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
-    private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             String intentAction;
@@ -167,14 +167,14 @@ public class BluetoothLeService extends Service {
         if (bluetoothManager == null) {
             bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
             if (bluetoothManager == null) {
-                Log.e(TAG, "Unable to initialize BluetoothManager.");
+                Log.e(TAG, "Unable to initialize bluetooth manager");
                 return false;
             }
         }
 
         bluetoothAdapter = bluetoothManager.getAdapter();
         if (bluetoothAdapter == null) {
-            Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
+            Log.e(TAG, "Unable to obtain a bluetooth manager");
             return false;
         }
 
@@ -194,26 +194,26 @@ public class BluetoothLeService extends Service {
         Log.d(TAG, "Connect " + address);
 
         if (bluetoothAdapter == null || address == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized or unspecified address.");
+            Log.w(TAG, "Bluetooth adapter not initialized or unspecified address.");
             return false;
         }
 
         // Previously connected device.  Try to reconnect.
         if (bluetoothDeviceAddress != null && address.equals(bluetoothDeviceAddress)
                 && bluetoothGatt != null) {
-            Log.d(TAG, "Trying to use an existing bluetoothGatt for connection.");
+            Log.d(TAG, "Trying to use an existing gatt for connection");
             return bluetoothGatt.connect();
         }
 
         final BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
-            Log.w(TAG, "Device not found.  Unable to connect.");
+            Log.w(TAG, "Device not found, unable to connect");
             return false;
         }
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
-        bluetoothGatt = device.connectGatt(this, false, mGattCallback);
-        Log.d(TAG, "Trying to create a new connection.");
+        bluetoothGatt = device.connectGatt(this, false, gattCallback);
+        Log.d(TAG, "Trying to create a new connection");
         bluetoothDeviceAddress = address;
         return true;
     }
@@ -228,7 +228,7 @@ public class BluetoothLeService extends Service {
         Log.d(TAG, "Disconnect");
 
         if (bluetoothAdapter == null || bluetoothGatt == null) {
-            Log.w(TAG, "BluetoothAdapter not initialized");
+            Log.w(TAG, "Bluetooth adapter not initialized");
             return;
         }
         bluetoothGatt.disconnect();

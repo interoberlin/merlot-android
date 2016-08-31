@@ -11,7 +11,15 @@ import java.lang.reflect.Method;
 public class DeviceCompatibilityUtils {
     // <editor-fold defaultstate="collapsed" desc="Members">
 
-    private static final String TAG = "DeviceCompatUtils";
+    private static final String TAG = DeviceCompatibilityUtils.class.getSimpleName();
+
+    // </editor-fold>
+
+    // --------------------
+    // Methods
+    // --------------------
+
+    // <editor-fold defaultstate="collapsed" desc="Methods">
 
     private static boolean isSdk19() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;

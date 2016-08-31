@@ -91,14 +91,14 @@ public class MappingController {
                         Mapping m = gson.create().fromJson(IOUtils.toString(inputStream, "UTF-8"), Mapping.class);
 
                         if (m != null) {
-                            Log.i(TAG, "Loaded mapping " + m.getName());
+                            Log.d(TAG, "Loaded mapping " + m.getName());
                             mappings.put(m.getName(), m);
                         }
                     }
                 }
             }
         } catch (IOException e) {
-            Log.e(TAG, e.toString());
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
 

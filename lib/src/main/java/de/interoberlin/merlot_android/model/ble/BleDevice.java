@@ -20,13 +20,14 @@ import de.interoberlin.merlot_android.DevicesRealm;
 import de.interoberlin.merlot_android.R;
 import de.interoberlin.merlot_android.controller.MappingController;
 import de.interoberlin.merlot_android.model.IDisplayable;
+import de.interoberlin.merlot_android.model.parser.BleDataParser;
 import de.interoberlin.merlot_android.model.repository.ECharacteristic;
 import de.interoberlin.merlot_android.model.repository.EDevice;
 import de.interoberlin.merlot_android.model.repository.EService;
-import de.interoberlin.merlot_android.model.parser.BleDataParser;
 import de.interoberlin.merlot_android.model.service.BaseService;
 import de.interoberlin.merlot_android.model.service.BleDeviceManager;
 import de.interoberlin.merlot_android.model.service.Reading;
+import de.interoberlin.merlot_android.model.util.BleUtils;
 import io.realm.Realm;
 import io.realm.RealmObject;
 import io.realm.annotations.Ignore;
@@ -355,7 +356,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
     }
 
     public Subscription write(final EService service, final ECharacteristic characteristic, final boolean value) {
-        Log.d(TAG, "Write " + characteristic.getId() + " : " + bytesToHex(value ? new byte[]{0x01} : new byte[]{0x00}));
+        Log.d(TAG, "Write " + characteristic.getId() + " : " + BleUtils.bytesToHex(value ? new byte[]{0x01} : new byte[]{0x00}));
 
         return write(service, characteristic, value ? new byte[]{0x01} : new byte[]{0x00});
     }
@@ -396,7 +397,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
 
                     @Override
                     public void onNext(BluetoothGattCharacteristic characteristic) {
-                        Log.d(TAG, characteristic.getUuid() + " " + bytesToHex(characteristic.getValue()));
+                        Log.d(TAG, characteristic.getUuid() + " " + BleUtils.bytesToHex(characteristic.getValue()));
                     }
                 });
     }
@@ -411,22 +412,11 @@ public class BleDevice extends RealmObject implements IDisplayable {
                 if (localMethod != null)
                     ocListener.onCacheCleared((Boolean) localMethod.invoke(gatt));
             }
-        } catch (Exception localException) {
-            Log.e(TAG, "An exception occurred while refreshing device");
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
 
         ocListener.onCacheCleared(false);
-    }
-
-    private String bytesToHex(byte[] bytes) {
-        char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
     }
 
     public BluetoothGattCharacteristic getCharacteristic(ECharacteristic characteristic) {
@@ -629,9 +619,10 @@ public class BleDevice extends RealmObject implements IDisplayable {
     }
 
     public synchronized void setAutoConnectEnabled(boolean autoConnectEnabled) {
+        Log.d(TAG, "Set Auto-connect enabled " + this.autoConnectEnabled);
+
         this.autoConnectEnabled = autoConnectEnabled;
 
-        Log.d(TAG, "Auto-connect for " + this.address + " : " + this.autoConnectEnabled);
         if (ocListener != null) {
             ocListener.onChange(this, autoConnectEnabled ? R.string.auto_connect_enabled : R.string.auto_connect_disabled);
         }

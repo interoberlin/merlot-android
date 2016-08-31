@@ -5,11 +5,11 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import de.interoberlin.mate.lib.model.Log;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
 import de.interoberlin.merlot_android.model.parser.BleDataParser;
 import de.interoberlin.merlot_android.model.parser.DataPackage;
@@ -57,6 +57,7 @@ public class BaseService extends Service {
 
     public static Observable<BaseService> connect(final Context context, final BleDevice bleDevice,
                                                   final BluetoothDevice device) {
+        android.util.Log.d(TAG, "Connect " + bleDevice.getName());
         final BluetoothGattReceiver receiver = new BluetoothGattReceiver();
         return doConnect(context, device, receiver, false)
                 .flatMap(new BondingReceiver.BondingFunc1(context))
@@ -76,8 +77,9 @@ public class BaseService extends Service {
      * @return an observable of the device that was connected.
      */
     public Observable<BleDevice> disconnect() {
-        return mBluetoothGattReceiver
-                .disconnect(mBluetoothGatt)
+        android.util.Log.d(TAG, "Disconnect");
+        return bluetoothGattReceiver
+                .disconnect(gatt)
                 .map(new Func1<BluetoothGatt, BleDevice>() {
                     @Override
                     public BleDevice call(BluetoothGatt gatt) {
@@ -93,14 +95,15 @@ public class BaseService extends Service {
      * @return observable containing reading
      */
     public Observable<Reading> read(final ECharacteristic characteristic) {
-        BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(mBluetoothGatt.getServices(), characteristic.getService().getId(), characteristic.getId());
+        android.util.Log.d(TAG, "Read " + characteristic.getName());
+        BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(gatt.getServices(), characteristic.getService().getId(), characteristic.getId());
 
         if (characteristic == null) {
             return error(new CharacteristicNotFoundException(characteristic.getId()));
         }
 
-        return mBluetoothGattReceiver
-                .readCharacteristic(mBluetoothGatt, c)
+        return bluetoothGattReceiver
+                .readCharacteristic(gatt, c)
                 .map(new Func1<BluetoothGattCharacteristic, String>() {
                     @Override
                     public String call(BluetoothGattCharacteristic c) {
@@ -110,7 +113,7 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.v(TAG, "Read " + s);
+                        Log.d(TAG, "Received " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
@@ -130,7 +133,8 @@ public class BaseService extends Service {
     }
 
     public Observable<Reading> subscribe(final EService service, final ECharacteristic characteristic) {
-        BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(mBluetoothGatt.getServices(), service.getId(), characteristic.getId());
+        Log.d(TAG, "Subscribe " + service.getName() + " / " + characteristic.getName());
+        BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(gatt.getServices(), service.getId(), characteristic.getId());
 
         if (characteristic == null) {
             return error(new CharacteristicNotFoundException("Service " + service.getId() + " / characteristic " + characteristic.getId()));
@@ -138,8 +142,8 @@ public class BaseService extends Service {
 
         BluetoothGattDescriptor descriptor = BleUtils.getDescriptorInCharacteristic(
                 c, EDescriptor.DATA_NOTIFICATIONS.getId());
-        return mBluetoothGattReceiver
-                .subscribeToCharacteristicChanges(mBluetoothGatt, c, descriptor)
+        return bluetoothGattReceiver
+                .subscribeToCharacteristicChanges(gatt, c, descriptor)
                 .map(new Func1<BluetoothGattCharacteristic, String>() {
                     @Override
                     public String call(BluetoothGattCharacteristic c) {
@@ -149,7 +153,7 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.v(TAG, "Read " + s);
+                        Log.d(TAG, "Received " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
@@ -169,15 +173,16 @@ public class BaseService extends Service {
     }
 
     public Observable<BluetoothGattCharacteristic> stopSubscribing(final EService service, final ECharacteristic characteristic) {
+        Log.d(TAG, "Stop subscribing " + service.getName() + " / " + characteristic.getName());
         BluetoothGattCharacteristic gattCharacteristic = BleUtils.getCharacteristicInServices(
-                mBluetoothGatt.getServices(), service.getId(), characteristic.getId());
+                gatt.getServices(), service.getId(), characteristic.getId());
         if (characteristic == null) {
             return error(new CharacteristicNotFoundException(characteristic.getId()));
         }
         BluetoothGattDescriptor descriptor = BleUtils.getDescriptorInCharacteristic(
                 gattCharacteristic, EDescriptor.DATA_NOTIFICATIONS.getId());
-        return mBluetoothGattReceiver
-                .unsubscribeToCharacteristicChanges(mBluetoothGatt, gattCharacteristic, descriptor);
+        return bluetoothGattReceiver
+                .unsubscribeToCharacteristicChanges(gatt, gattCharacteristic, descriptor);
     }
 
     // </editor-fold>

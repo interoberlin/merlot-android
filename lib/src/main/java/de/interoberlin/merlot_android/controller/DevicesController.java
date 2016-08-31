@@ -82,7 +82,7 @@ public class DevicesController {
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 
         if (bluetoothAdapter == null) {
-            Log.e(TAG, "Unable to obtain a BluetoothAdapter.");
+            Log.e(TAG, "Unable to obtain a bluetooth adapter");
         } else {
             scan(context, bluetoothManager, bluetoothAdapter, callback)
                     .filter(new Func1<List<BleDevice>, Boolean>() {
@@ -138,7 +138,7 @@ public class DevicesController {
      */
     private Observable<List<BleDevice>> scan(Context context, BluetoothManager bluetoothManager, BluetoothAdapter bluetoothAdapter, BleScannerFilter.BleFilteredScanCallback callback) {
         for (BluetoothDevice d : bluetoothManager.getConnectedDevices(BluetoothProfile.GATT_SERVER)) {
-            Log.v(TAG, "Already connected " + d.getName());
+            Log.d(TAG, "Already connected " + d.getName());
         }
 
         this.bluetoothDeviceManager = BleDeviceManager.getInstance();

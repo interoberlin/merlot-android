@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.content.Context;
+import android.util.Log;
 
 import java.util.Map;
 import java.util.UUID;
@@ -30,24 +31,26 @@ import static android.bluetooth.BluetoothProfile.STATE_DISCONNECTED;
 public class BluetoothGattReceiver extends BluetoothGattCallback {
     // <editor-fold defaultstate="collapsed" desc="Members">
 
+    public static final String TAG = BluetoothGattReceiver.class.getSimpleName();
+
     private Context context;
 
-    private volatile Subscriber<? super BluetoothGatt> mConnectionChangesSubscriber;
-    private volatile Subscriber<? super BluetoothGatt> mDisconnectedSubscriber;
-    private volatile Subscriber<? super BluetoothGatt> mBluetoothGattServiceSubscriber;
-    private volatile Subscriber<? super BluetoothGattCharacteristic> mValueChangesSubscriber;
-    private volatile Subscriber<? super BluetoothGattCharacteristic> mValueChangesUnSubscriber;
+    private volatile Subscriber<? super BluetoothGatt> connectionChangesSubscriber;
+    private volatile Subscriber<? super BluetoothGatt> disconnectedSubscriber;
+    private volatile Subscriber<? super BluetoothGatt> bluetoothGattServiceSubscriber;
+    private volatile Subscriber<? super BluetoothGattCharacteristic> valueChangesSubscriber;
+    private volatile Subscriber<? super BluetoothGattCharacteristic> valueChangesUnSubscriber;
     private volatile Map<UUID, Subscriber<? super BluetoothGattCharacteristic>>
-            mWriteCharacteristicsSubscriberMap = new ConcurrentHashMap<>();
+            writeCharacteristicsSubscriberMap = new ConcurrentHashMap<>();
     private volatile Map<UUID, Subscriber<? super BluetoothGattCharacteristic>>
-            mReadCharacteristicsSubscriberMap = new ConcurrentHashMap<>();
-    private volatile Subscriber<? super BluetoothGatt> mReliableWriteSubscriber;
+            readCharacteristicsSubscriberMap = new ConcurrentHashMap<>();
+    private volatile Subscriber<? super BluetoothGatt> reliableWriteSubscriber;
 
     public Observable<BluetoothGatt> connect(final Context context, final BluetoothDevice bluetoothDevice) {
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(Subscriber<? super BluetoothGatt> subscriber) {
-                mConnectionChangesSubscriber = subscriber;
+                connectionChangesSubscriber = subscriber;
                 bluetoothDevice.connectGatt(context, false, BluetoothGattReceiver.this);
             }
         });
@@ -60,6 +63,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
         }
 
         static void fixUndocumentedBleStatusProblem(final Context context, BluetoothGatt gatt, BluetoothGattReceiver receiver) {
+            Log.d(TAG, "Fix undocumented BLE status problem");
             DeviceCompatibilityUtils.refresh(gatt);
             gatt.getDevice().connectGatt(context, false, receiver);
         }
@@ -74,12 +78,13 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     public Observable<BluetoothGatt> discoverServices(final BluetoothGatt bluetoothGatt) {
+        Log.d(TAG, "Discover services");
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(Subscriber<? super BluetoothGatt> subscriber) {
-                mBluetoothGattServiceSubscriber = subscriber;
-                //if (bluetoothGatt.getServices() != null && bluetoothGatt.getServices().size() > 0)
-                //    mBluetoothGattServiceSubscriber.onNext(bluetoothGatt);
+                bluetoothGattServiceSubscriber = subscriber;
+                //if (gatt.getServices() != null && gatt.getServices().size() > 0)
+                //    bluetoothGattServiceSubscriber.onNext(gatt);
                 //else // TODO: we don't cache bc we don't know if the services are up to date...
                 bluetoothGatt.discoverServices();
             }
@@ -87,10 +92,11 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     }
 
     public Observable<BluetoothGatt> disconnect(final BluetoothGatt bluetoothGatt) {
+        Log.d(TAG, "Disconnect");
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(Subscriber<? super BluetoothGatt> subscriber) {
-                mDisconnectedSubscriber = subscriber;
+                disconnectedSubscriber = subscriber;
                 bluetoothGatt.disconnect();
             }
         });
@@ -99,10 +105,11 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     public Observable<BluetoothGattCharacteristic>
     writeCharacteristic(final BluetoothGatt bluetoothGatt,
                         final BluetoothGattCharacteristic characteristic) {
+        Log.d(TAG, "Write characteristic");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
-                mWriteCharacteristicsSubscriberMap.put(characteristic.getUuid(), subscriber);
+                writeCharacteristicsSubscriberMap.put(characteristic.getUuid(), subscriber);
                 bluetoothGatt.writeCharacteristic(characteristic);
             }
         });
@@ -111,17 +118,19 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     public void reliableWriteCharacteristic(final BluetoothGatt bluetoothGatt,
                                             final BluetoothGattCharacteristic characteristic,
                                             Subscriber<? super BluetoothGatt> subscriber) {
-        if (mReliableWriteSubscriber == null) mReliableWriteSubscriber = subscriber;
+        Log.d(TAG, "Reliable write characteristic");
+        if (reliableWriteSubscriber == null) reliableWriteSubscriber = subscriber;
         bluetoothGatt.writeCharacteristic(characteristic);
     }
 
     public Observable<BluetoothGattCharacteristic> readCharacteristic(
             final BluetoothGatt gatt,
             final BluetoothGattCharacteristic characteristic) {
+        Log.d(TAG, "Read characteristic");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
-                mReadCharacteristicsSubscriberMap.put(characteristic.getUuid(), subscriber);
+                readCharacteristicsSubscriberMap.put(characteristic.getUuid(), subscriber);
                 gatt.readCharacteristic(characteristic);
             }
         });
@@ -131,10 +140,11 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
             final BluetoothGatt gatt,
             final BluetoothGattCharacteristic characteristic,
             final BluetoothGattDescriptor descriptor) {
+        Log.d(TAG, "Subscribe to characteristic changes");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
-                mValueChangesSubscriber = subscriber;
+                valueChangesSubscriber = subscriber;
                 gatt.setCharacteristicNotification(characteristic, true);
                 descriptor.setValue(ENABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
@@ -146,10 +156,11 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
             final BluetoothGatt gatt,
             final BluetoothGattCharacteristic characteristic,
             final BluetoothGattDescriptor descriptor) {
+        Log.d(TAG, "Unsubscribe to characteristic changes");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
-                mValueChangesUnSubscriber = subscriber;
+                valueChangesUnSubscriber = subscriber;
                 gatt.setCharacteristicNotification(characteristic, false);
                 descriptor.setValue(DISABLE_NOTIFICATION_VALUE);
                 gatt.writeDescriptor(descriptor);
@@ -171,7 +182,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
 //            tryToReconnect(gatt, this); return;
 //        } else if (isGattError(status)) {
 //            fixGattError(gatt, this);
-//            mConnectionChangesSubscriber.onError(new DisconnectionException(status + ""));
+//            connectionChangesSubscriber.onError(new DisconnectionException(status + ""));
 //            return;
 //        }
 
@@ -182,45 +193,45 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
         if (status != GATT_SUCCESS) return;
 
         if (newState == STATE_CONNECTED) { // on connected
-            if (mConnectionChangesSubscriber != null) mConnectionChangesSubscriber.onNext(gatt);
+            if (connectionChangesSubscriber != null) connectionChangesSubscriber.onNext(gatt);
         } else if (newState == STATE_DISCONNECTED) {
-            if (mDisconnectedSubscriber != null) { // disconnected voluntarily
+            if (disconnectedSubscriber != null) { // disconnected voluntarily
                 gatt.close(); // should stay here since you might want to reconnect if involuntarily
-                mDisconnectedSubscriber.onNext(gatt);
-                mDisconnectedSubscriber.onCompleted();
+                disconnectedSubscriber.onNext(gatt);
+                disconnectedSubscriber.onCompleted();
             } else { // disconnected involuntarily because an error occurred
-                if (mConnectionChangesSubscriber != null)
-                    mConnectionChangesSubscriber.onError(new DisconnectionException(status + ""));
+                if (connectionChangesSubscriber != null)
+                    connectionChangesSubscriber.onError(new DisconnectionException(status + ""));
             }
         } /*else if (BluetoothGattStatus.isFailureStatus(status)) {
-            if (mConnectionChangesSubscriber != null)  // TODO: unreachable -propagate error earlier
-                mConnectionChangesSubscriber.onError(new GattException(status + ""));
+            if (connectionChangesSubscriber != null)  // TODO: unreachable -propagate error earlier
+                connectionChangesSubscriber.onError(new GattException(status + ""));
         }*/
     }
 
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-        if (mBluetoothGattServiceSubscriber == null) return;
-        mBluetoothGattServiceSubscriber.onNext(gatt);
+        if (bluetoothGattServiceSubscriber == null) return;
+        bluetoothGattServiceSubscriber.onNext(gatt);
     }
 
     @Override
     public void onReliableWriteCompleted(final BluetoothGatt gatt, int status) {
-        if (mReliableWriteSubscriber == null) return;
+        if (reliableWriteSubscriber == null) return;
 
         if (status == GATT_SUCCESS) {
-            mReliableWriteSubscriber.onNext(gatt);
-            mReliableWriteSubscriber.onCompleted();
+            reliableWriteSubscriber.onNext(gatt);
+            reliableWriteSubscriber.onCompleted();
         } else if (GATT_INSUFFICIENT_AUTHENTICATION == status || GATT_INSUFFICIENT_ENCRYPTION == status) {
-            mReliableWriteSubscriber.onError(new GattException("Authentication"));
+            reliableWriteSubscriber.onError(new GattException("Authentication"));
 //        } else if (isGattError(status)) {
 //            fixGattError(gatt, this);
-//            mReliableWriteSubscriber.onError(new UndocumentedException());
+//            reliableWriteSubscriber.onError(new UndocumentedException());
         } else {
-            mReliableWriteSubscriber.onError(new GattException("Reliable write failed."));
+            reliableWriteSubscriber.onError(new GattException("Reliable write failed."));
         }
 
-        mReliableWriteSubscriber = null;
+        reliableWriteSubscriber = null;
     }
 
     @Override
@@ -228,7 +239,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
                                       final BluetoothGattCharacteristic characteristic,
                                       int status) {
         Subscriber<? super BluetoothGattCharacteristic> subscriber =
-                mWriteCharacteristicsSubscriberMap.remove(characteristic.getUuid());
+                writeCharacteristicsSubscriberMap.remove(characteristic.getUuid());
         if (status == GATT_SUCCESS) {
             subscriber.onNext(characteristic);
         } else if (GATT_INSUFFICIENT_AUTHENTICATION == status || GATT_INSUFFICIENT_ENCRYPTION == status) {
@@ -253,7 +264,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
                                      final BluetoothGattCharacteristic characteristic,
                                      int status) {
         Subscriber<? super BluetoothGattCharacteristic> subscriber =
-                mReadCharacteristicsSubscriberMap.remove(characteristic.getUuid());
+                readCharacteristicsSubscriberMap.remove(characteristic.getUuid());
         if (status == GATT_SUCCESS) {
             subscriber.onNext(characteristic);
         } else if (GATT_INSUFFICIENT_AUTHENTICATION == status || GATT_INSUFFICIENT_ENCRYPTION == status) {
@@ -276,14 +287,14 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     @Override
     public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
         super.onDescriptorWrite(gatt, descriptor, status);
-        if (mValueChangesUnSubscriber != null) {
-            mValueChangesUnSubscriber.onNext(descriptor.getCharacteristic());
+        if (valueChangesUnSubscriber != null) {
+            valueChangesUnSubscriber.onNext(descriptor.getCharacteristic());
         }
     }
 
     @Override
     public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-        mValueChangesSubscriber.onNext(characteristic);
+        valueChangesSubscriber.onNext(characteristic);
     }
 
     // </editor-fold>

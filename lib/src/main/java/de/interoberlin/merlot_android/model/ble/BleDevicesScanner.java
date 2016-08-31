@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,7 @@ public class BleDevicesScanner implements
     }
 
     public synchronized void start() {
+        Log.d(TAG, "Start");
         if (isScanning()) {
             return;
         }
@@ -118,6 +120,7 @@ public class BleDevicesScanner implements
     }
 
     public synchronized void stop() {
+        Log.d(TAG, "Stop");
         if (!isScanning()) return;
 
         isScanning = false;
@@ -131,6 +134,7 @@ public class BleDevicesScanner implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private synchronized void stopScan() {
+        Log.d(TAG, "Stop scan");
         if (isBluetoothEnabled()) {
             if (Build.VERSION.SDK_INT < 21 || leScanner == null) {
                 bluetoothAdapter.cancelDiscovery();
