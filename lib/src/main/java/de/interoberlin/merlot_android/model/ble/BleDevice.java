@@ -289,7 +289,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
                         Log.d(TAG, "Next value " + reading.meaning);
 
                         if (debug) {
-                            setCharacteristicValue(characteristic.getId(), reading.toString(), debug);
+                            setCharacteristicValue(characteristic.getId(), reading.value.toString(), debug);
                         } else {
                             Queue<Reading> queue;
                             if (readings.containsKey(reading.meaning)) {
