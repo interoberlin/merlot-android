@@ -110,7 +110,7 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.v(TAG, "Processed " + s);
+                        Log.v(TAG, "Read " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
@@ -149,7 +149,7 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.v(TAG, "Processed " + s);
+                        Log.v(TAG, "Read " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {

@@ -53,6 +53,8 @@ public class BluetoothLeService extends Service {
             "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
     public final static String ACTION_GATT_SERVICES_DISCOVERED =
             "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
+    public final static String ACTION_GATT_SERVICES_DISCOVERY_FAILED =
+            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERY_FAILED";
     public final static String ACTION_DATA_AVAILABLE =
             "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
     public final static String EXTRA_CHARACTERISTIC_ID =
@@ -61,6 +63,8 @@ public class BluetoothLeService extends Service {
             "com.example.bluetooth.le.EXTRA_CHARACTERISTIC_VALUE";
     public final static String EXTRA_DEVICE_ADDRESS =
             "com.example.bluetooth.le.EXTRA_DEVICE_ADDRESS ";
+    public final static String EXTRA_ERROR_CODE =
+            "com.example.bluetooth.le.EXTRA_ERROR_CODE";
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
@@ -88,7 +92,7 @@ public class BluetoothLeService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED, gatt);
             } else {
-                Log.d(TAG, "Services discovered " + status);
+                broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERY_FAILED, String.valueOf(status));
             }
         }
 
@@ -122,16 +126,22 @@ public class BluetoothLeService extends Service {
         sendBroadcast(intent);
     }
 
+    private void broadcastUpdate(final String action, final String value) {
+        final Intent intent = new Intent(action);
+        intent.putExtra(EXTRA_ERROR_CODE, value);
+        sendBroadcast(intent);
+    }
+
     private void broadcastUpdate(final String action, final BluetoothGatt gatt) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DEVICE_ADDRESS , gatt.getDevice().getAddress());
+        intent.putExtra(EXTRA_DEVICE_ADDRESS, gatt.getDevice().getAddress());
         sendBroadcast(intent);
     }
 
     private void broadcastUpdate(final String action, final BluetoothGatt gatt,
                                  final BluetoothGattCharacteristic characteristic) {
         final Intent intent = new Intent(action);
-        intent.putExtra(EXTRA_DEVICE_ADDRESS , gatt.getDevice().getAddress());
+        intent.putExtra(EXTRA_DEVICE_ADDRESS, gatt.getDevice().getAddress());
 
         // For all other profiles, writes the data formatted in HEX.
         final byte[] data = characteristic.getValue();
