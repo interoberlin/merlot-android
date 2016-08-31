@@ -59,7 +59,7 @@ class BondingReceiver {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     static Observable<BluetoothGatt> subscribeForBondStateChanges(final Context context, final BluetoothGatt gatt) {
-        Log.d(TAG, "Subscribe for bond state changes");
+        Log.v(TAG, "Subscribe for bond state changes");
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(final Subscriber<? super BluetoothGatt> subscriber) {

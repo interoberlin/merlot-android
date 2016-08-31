@@ -57,7 +57,7 @@ public class BaseService extends Service {
 
     public static Observable<BaseService> connect(final Context context, final BleDevice bleDevice,
                                                   final BluetoothDevice device) {
-        android.util.Log.d(TAG, "Connect " + bleDevice.getName());
+        android.util.Log.v(TAG, "Connect " + bleDevice.getName());
         final BluetoothGattReceiver receiver = new BluetoothGattReceiver();
         return doConnect(context, device, receiver, false)
                 .flatMap(new BondingReceiver.BondingFunc1(context))
@@ -77,7 +77,7 @@ public class BaseService extends Service {
      * @return an observable of the device that was connected.
      */
     public Observable<BleDevice> disconnect() {
-        android.util.Log.d(TAG, "Disconnect");
+        android.util.Log.v(TAG, "Disconnect");
         return bluetoothGattReceiver
                 .disconnect(gatt)
                 .map(new Func1<BluetoothGatt, BleDevice>() {
@@ -95,7 +95,7 @@ public class BaseService extends Service {
      * @return observable containing reading
      */
     public Observable<Reading> read(final ECharacteristic characteristic) {
-        android.util.Log.d(TAG, "Read " + characteristic.getName());
+        android.util.Log.v(TAG, "Read " + characteristic.getName());
         BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(gatt.getServices(), characteristic.getService().getId(), characteristic.getId());
 
         if (characteristic == null) {
@@ -113,7 +113,7 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.d(TAG, "Received " + s);
+                        Log.v(TAG, "Received " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
@@ -133,7 +133,7 @@ public class BaseService extends Service {
     }
 
     public Observable<Reading> subscribe(final EService service, final ECharacteristic characteristic) {
-        Log.d(TAG, "Subscribe " + service.getName() + " / " + characteristic.getName());
+        Log.v(TAG, "Subscribe " + service.getName() + " / " + characteristic.getName());
         BluetoothGattCharacteristic c = BleUtils.getCharacteristicInServices(gatt.getServices(), service.getId(), characteristic.getId());
 
         if (characteristic == null) {
@@ -153,7 +153,7 @@ public class BaseService extends Service {
                 .flatMap(new Func1<String, Observable<Reading>>() {
                     @Override
                     public Observable<Reading> call(final String s) {
-                        Log.d(TAG, "Received " + s);
+                        Log.v(TAG, "Received " + s);
                         return Observable.create(new Observable.OnSubscribe<Reading>() {
                             @Override
                             public void call(Subscriber<? super Reading> subscriber) {
@@ -173,7 +173,7 @@ public class BaseService extends Service {
     }
 
     public Observable<BluetoothGattCharacteristic> stopSubscribing(final EService service, final ECharacteristic characteristic) {
-        Log.d(TAG, "Stop subscribing " + service.getName() + " / " + characteristic.getName());
+        Log.v(TAG, "Stop subscribing " + service.getName() + " / " + characteristic.getName());
         BluetoothGattCharacteristic gattCharacteristic = BleUtils.getCharacteristicInServices(
                 gatt.getServices(), service.getId(), characteristic.getId());
         if (characteristic == null) {

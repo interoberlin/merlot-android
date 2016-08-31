@@ -105,7 +105,7 @@ public class BleDevicesScanner implements
     }
 
     public synchronized void start() {
-        Log.d(TAG, "Start");
+        Log.v(TAG, "Start");
         if (isScanning()) {
             return;
         }
@@ -120,7 +120,7 @@ public class BleDevicesScanner implements
     }
 
     public synchronized void stop() {
-        Log.d(TAG, "Stop");
+        Log.v(TAG, "Stop");
         if (!isScanning()) return;
 
         isScanning = false;
@@ -134,7 +134,7 @@ public class BleDevicesScanner implements
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private synchronized void stopScan() {
-        Log.d(TAG, "Stop scan");
+        Log.v(TAG, "Stop scan");
         if (isBluetoothEnabled()) {
             if (Build.VERSION.SDK_INT < 21 || leScanner == null) {
                 bluetoothAdapter.cancelDiscovery();

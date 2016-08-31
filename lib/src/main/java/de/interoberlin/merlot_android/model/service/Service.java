@@ -27,7 +27,7 @@ import static rx.Observable.just;
 public class Service {
     // <editor-fold defaultstate="collapsed" desc="Members">
 
-    public static final String TAG = Service.class.getName();
+    public static final String TAG = Service.class.getSimpleName();
 
     protected BluetoothGatt gatt;
     protected final BluetoothGattReceiver bluetoothGattReceiver;
@@ -60,7 +60,7 @@ public class Service {
     protected static Observable<? extends BluetoothGatt> doConnect(final Context context,
             final BluetoothDevice bluetoothDevice, final BluetoothGattReceiver receiver,
             final boolean unBond) {
-        Log.d(TAG, "Do connect");
+        Log.v(TAG, "Do connect");
         return receiver
                 .connect(context, bluetoothDevice)
                 .flatMap(new Func1<BluetoothGatt, Observable<? extends BluetoothGatt>>() {
@@ -91,7 +91,7 @@ public class Service {
     public Observable<BluetoothGattCharacteristic> write(byte[] bytes,
                                                          String serviceUuid,
                                                          String characteristicUuid) {
-        Log.d(TAG, "Service " + serviceUuid + " / " + characteristicUuid + " : " + bytes);
+        Log.v(TAG, "Service " + serviceUuid + " / " + characteristicUuid + " : " + bytes);
         BluetoothGattCharacteristic characteristic = BleUtils.getCharacteristicInServices(
                 gatt.getServices(), serviceUuid, characteristicUuid);
         if (characteristic == null) {

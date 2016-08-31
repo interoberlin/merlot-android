@@ -48,14 +48,14 @@ public class BleDeviceManager {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     public void addSubscriber(Long key, Subscriber<? super List<BleDevice>> devicesSubscriber) {
-        Log.d(TAG, "Add subscriber " + key);
+        Log.v(TAG, "Add subscriber " + key);
         devicesSubscriberMap.put(key, devicesSubscriber);
         if (!discoveredDevices.isEmpty()) devicesSubscriber.onNext(getDiscoveredDevices());
     }
 
     // TODO EXTREMELY IMPORTANT METHOD
     public void addDiscoveredDevice(BleDevice device) {
-        Log.d(TAG, "Add discovered device " + device.getName());
+        Log.v(TAG, "Add discovered device " + device.getName());
         discoveredDevices.remove(device.getAddress());
         discoveredDevices.put(device.getAddress(), device);
 
@@ -64,12 +64,12 @@ public class BleDeviceManager {
     }
 
     public void removeDevice(BleDevice device) {
-        Log.d(TAG, "Remove device " + device.getName());
+        Log.v(TAG, "Remove device " + device.getName());
         discoveredDevices.remove(device.getAddress());
     }
 
     public void removeSubscriber(Long key) {
-        Log.d(TAG, "Remove subscriber " + key);
+        Log.v(TAG, "Remove subscriber " + key);
         devicesSubscriberMap.remove(key);
     }
 

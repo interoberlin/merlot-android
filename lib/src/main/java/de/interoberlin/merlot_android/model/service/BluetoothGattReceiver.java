@@ -63,7 +63,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
         }
 
         static void fixUndocumentedBleStatusProblem(final Context context, BluetoothGatt gatt, BluetoothGattReceiver receiver) {
-            Log.d(TAG, "Fix undocumented BLE status problem");
+            Log.v(TAG, "Fix undocumented BLE status problem");
             DeviceCompatibilityUtils.refresh(gatt);
             gatt.getDevice().connectGatt(context, false, receiver);
         }
@@ -78,7 +78,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     // <editor-fold defaultstate="collapsed" desc="Methods">
 
     public Observable<BluetoothGatt> discoverServices(final BluetoothGatt bluetoothGatt) {
-        Log.d(TAG, "Discover services");
+        Log.v(TAG, "Discover services");
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(Subscriber<? super BluetoothGatt> subscriber) {
@@ -92,7 +92,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     }
 
     public Observable<BluetoothGatt> disconnect(final BluetoothGatt bluetoothGatt) {
-        Log.d(TAG, "Disconnect");
+        Log.v(TAG, "Disconnect");
         return Observable.create(new Observable.OnSubscribe<BluetoothGatt>() {
             @Override
             public void call(Subscriber<? super BluetoothGatt> subscriber) {
@@ -105,7 +105,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     public Observable<BluetoothGattCharacteristic>
     writeCharacteristic(final BluetoothGatt bluetoothGatt,
                         final BluetoothGattCharacteristic characteristic) {
-        Log.d(TAG, "Write characteristic");
+        Log.v(TAG, "Write characteristic");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
@@ -118,7 +118,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     public void reliableWriteCharacteristic(final BluetoothGatt bluetoothGatt,
                                             final BluetoothGattCharacteristic characteristic,
                                             Subscriber<? super BluetoothGatt> subscriber) {
-        Log.d(TAG, "Reliable write characteristic");
+        Log.v(TAG, "Reliable write characteristic");
         if (reliableWriteSubscriber == null) reliableWriteSubscriber = subscriber;
         bluetoothGatt.writeCharacteristic(characteristic);
     }
@@ -126,7 +126,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
     public Observable<BluetoothGattCharacteristic> readCharacteristic(
             final BluetoothGatt gatt,
             final BluetoothGattCharacteristic characteristic) {
-        Log.d(TAG, "Read characteristic");
+        Log.v(TAG, "Read characteristic");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
@@ -140,7 +140,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
             final BluetoothGatt gatt,
             final BluetoothGattCharacteristic characteristic,
             final BluetoothGattDescriptor descriptor) {
-        Log.d(TAG, "Subscribe to characteristic changes");
+        Log.v(TAG, "Subscribe to characteristic changes");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
@@ -156,7 +156,7 @@ public class BluetoothGattReceiver extends BluetoothGattCallback {
             final BluetoothGatt gatt,
             final BluetoothGattCharacteristic characteristic,
             final BluetoothGattDescriptor descriptor) {
-        Log.d(TAG, "Unsubscribe to characteristic changes");
+        Log.v(TAG, "Unsubscribe to characteristic changes");
         return Observable.create(new Observable.OnSubscribe<BluetoothGattCharacteristic>() {
             @Override
             public void call(Subscriber<? super BluetoothGattCharacteristic> subscriber) {
