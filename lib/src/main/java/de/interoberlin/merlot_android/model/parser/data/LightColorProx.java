@@ -1,4 +1,4 @@
-package de.interoberlin.merlot_android.model.parser;
+package de.interoberlin.merlot_android.model.parser.data;
 
 public class LightColorProx {
     // <editor-fold defaultstate="collapsed" desc="Members">

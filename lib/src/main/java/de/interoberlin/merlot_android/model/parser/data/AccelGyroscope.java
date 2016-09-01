@@ -1,4 +1,4 @@
-package de.interoberlin.merlot_android.model.parser;
+package de.interoberlin.merlot_android.model.parser.data;
 
 public class AccelGyroscope {
     // <editor-fold defaultstate="collapsed" desc="Members">

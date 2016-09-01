@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothGattCharacteristic;
 
 import com.google.gson.Gson;
 
+import de.interoberlin.merlot_android.model.parser.data.AccelGyroscope;
+import de.interoberlin.merlot_android.model.parser.data.LightColorProx;
 import de.interoberlin.merlot_android.model.repository.ECharacteristic;
 import de.interoberlin.merlot_android.model.repository.EDevice;
 
@@ -81,6 +83,7 @@ public abstract class BleDataParser {
                     case WUNDERBAR_BRIDG: {
                         return getBridgeSensorData(value);
                     }
+                    case SENTIENT_LIGHT_FLOOR_SENSOR:
                     default:
                         return "";
                 }

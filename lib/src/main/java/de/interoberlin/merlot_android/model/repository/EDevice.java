@@ -10,7 +10,8 @@ public enum EDevice {
     WUNDERBAR_BRIDG("ebd828dd-250c-4baf-807d-69d85bed065b","WunderbarBRIDG"),
     WUNDERBAR_IR("bab45b9c-1c44-4e71-8e98-a321c658df47","WunderbarIR"),
 
-    INTEROBERLIN_SENTIENT_LIGHT("be73d68c-1d33-11e6-b6ba-3e1d05defe78","InteroberlinSentientLight"),
+    SENTIENT_LIGHT_FLOOR_SENSOR("be73d68c-1d33-11e6-b6ba-3e1d05defe78","SentientLightFloorSensor"),
+    SENTIENT_LIGHT_LED("c9327d7b-a967-4ed2-9fa1-b87da6e69d02","SentientLightLED"),
     NRFDUINO("e3598c73-6f6e-4be6-9861-ee6fb9378dcc","nRFduino"),
     UNKNOWN("", "");
 
