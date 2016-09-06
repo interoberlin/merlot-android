@@ -15,29 +15,32 @@ import de.interoberlin.merlot_android.model.mapping.actions.IAction;
 import de.interoberlin.merlot_android.model.mapping.exceptions.MappingException;
 import de.interoberlin.merlot_android.model.mapping.functions.IFunction;
 import de.interoberlin.merlot_android.model.service.Reading;
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
 import rx.Observer;
 import rx.Subscription;
 
-public class Mapping implements IDisplayable {
+public class Mapping extends RealmObject implements IDisplayable {
     // <editor-fold defaultstate="collapsed" desc="Members">
 
     public static final String TAG = Mapping.class.getSimpleName();
 
-    private String name;
+    @PrimaryKey private String name;
     private Integer debounce;
     private Source source;
     private Sink sink;
     private IFunction function;
     private IAction action;
 
-    private transient boolean sourceAttached;
-    private transient boolean sourceSubscribed;
-    private transient boolean sinkAttached;
-    private transient boolean triggered;
+    @Ignore private transient boolean sourceAttached;
+    @Ignore private transient boolean sourceSubscribed;
+    @Ignore private transient boolean sinkAttached;
+    @Ignore private transient boolean triggered;
 
-    private Subscription subscription;
+    @Ignore private Subscription subscription;
 
-    private OnChangeListener ocListener;
+    @Ignore private OnChangeListener ocListener;
 
     // </editor-fold>
 

@@ -2,11 +2,12 @@ package de.interoberlin.merlot_android;
 
 import android.content.Context;
 
-import de.interoberlin.merlot_android.modules.DevicesModule;
+import de.interoberlin.merlot_android.modules.BleDeviceModule;
+import de.interoberlin.merlot_android.modules.MappingModule;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 
-public class DevicesRealm {
+public class MerlotRealm {
     // <editor-fold defaultstate="collapsed" desc="Members">
 
     private final RealmConfiguration realmConfig;
@@ -19,10 +20,10 @@ public class DevicesRealm {
 
     // <editor-fold defaultstate="collapsed" desc="Constructors">
 
-    public DevicesRealm(Context context) {
+    public MerlotRealm(Context context) {
         realmConfig = new RealmConfiguration.Builder(context)
                 .name("de.interoberlin.merlot")
-                .modules(new DevicesModule())
+                .modules(new BleDeviceModule(), new MappingModule())
                 .build();
 
         // Realm.deleteRealm(realmConfig);

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.interoberlin.merlot_android.DevicesRealm;
+import de.interoberlin.merlot_android.MerlotRealm;
 import de.interoberlin.merlot_android.model.ble.BleDevice;
 import de.interoberlin.merlot_android.model.ble.BleDevicesScanner;
 import de.interoberlin.merlot_android.model.ble.BleScannerFilter;
@@ -285,7 +285,7 @@ public class DevicesController {
      * @return true is auto-connect is enabled
      */
     public boolean isAutoConnectEnabled(Context context, BleDevice device) {
-        Realm realm = new DevicesRealm(context).getRealm();
+        Realm realm = new MerlotRealm(context).getRealm();
 
         boolean autoConnectEnabled = realm.where(BleDevice.class)
                 .equalTo("address", device.getAddress())

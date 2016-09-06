@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import de.interoberlin.merlot_android.DevicesRealm;
+import de.interoberlin.merlot_android.MerlotRealm;
 import de.interoberlin.merlot_android.R;
 import de.interoberlin.merlot_android.controller.MappingController;
 import de.interoberlin.merlot_android.model.IDisplayable;
@@ -124,7 +124,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
      */
     public void init(Context context) {
         // Read device from realm
-        final Realm realm = new DevicesRealm(context).getRealm();
+        final Realm realm = new MerlotRealm(context).getRealm();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
@@ -443,7 +443,7 @@ public class BleDevice extends RealmObject implements IDisplayable {
     }
 
     public void save(Context context) {
-        Realm realm = new DevicesRealm(context).getRealm();
+        Realm realm = new MerlotRealm(context).getRealm();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
